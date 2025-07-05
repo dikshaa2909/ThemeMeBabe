@@ -1,0 +1,81 @@
+{
+  "name": "thememebabe",
+  "displayName": "ThemeMeBabe",
+  "description": "VS Code changes themes based on your mood.",
+  "version": "0.0.1",
+  "publisher": "thememebabe",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dikshaa2909/thememebabe"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["*"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "themes": [
+      {
+        "label": "Rizz Focused",
+        "uiTheme": "vs-dark",
+        "path": "./themes/focused-theme.json"
+      },
+      {
+        "label": "Rizz Tired",
+        "uiTheme": "vs",
+        "path": "./themes/tired-theme.json"
+      },
+      {
+        "label": "Rizz Frustrated",
+        "uiTheme": "vs-dark",
+        "path": "./themes/frustrated-theme.json"
+      },
+      {
+        "label": "Rizz Neutral",
+        "uiTheme": "vs",
+        "path": "./themes/neutral-theme.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ThemeMeBabe.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "ThemeMeBabe.toggleMoodThemes",
+        "title": "ThemeMeBabe: Toggle Mood Themes"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "ThemeMeBabe Settings",
+      "properties": {
+        "thememebabe.intervalSeconds": {
+          "type": "number",
+          "default": 15,
+          "minimum": 5,
+          "maximum": 120,
+          "description": "How often (in seconds) ThemeMeBabe analyzes your mood and switches theme."
+        },
+        "thememebabe.enableThemeSwitching": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable automatic mood-based theme switching."
+        },
+        "thememebabe.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show your mood in the VS Code status bar."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/vscode": "^1.80.0"
+  }
+}
