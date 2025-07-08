@@ -8,10 +8,10 @@ let speedItem: vscode.StatusBarItem;
 let backspaceItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log("🔥 EXTENSION ACTIVATED 🔥");
-  vscode.window.showInformationMessage("✅ ThemeMeBabe is active");
+  console.log("🔥 ThemeMeBabe activated");
+  vscode.window.setStatusBarMessage("🌈 ThemeMeBabe is running!", 3000);
 
-  // Status Bar Items
+  // Create status bar items
   moodItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   speedItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
   backspaceItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 98);
@@ -26,39 +26,53 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(moodItem, speedItem, backspaceItem);
 
-  // Track typing and backspaces
+  // Track keypresses and backspaces
   vscode.workspace.onDidChangeTextDocument((event) => {
     const changes = event.contentChanges;
     if (!changes || changes.length === 0) return;
+
     const now = Date.now();
     keyPressTimestamps.push(now);
     if (changes[0].text === "") backspaceCount++;
   });
 
-  // Get user setting for interval
   const config = vscode.workspace.getConfiguration('thememebabe');
+  const autoSwitch = config.get<boolean>('autoThemeSwitch', true);
+  const fixedTheme = config.get<string>('fixedTheme', 'Rizz Focused');
   const intervalSeconds = config.get<number>('intervalSeconds', 15);
   const intervalMs = intervalSeconds * 1000;
 
-  // Mood detection loop
+  // 🎯 Fixed Theme Mode
+  if (!autoSwitch) {
+    setTimeout(() => {
+      vscode.workspace.getConfiguration().update(
+        "workbench.colorTheme",
+        fixedTheme,
+        vscode.ConfigurationTarget.Global
+      );
+      vscode.window.setStatusBarMessage(`🎯 Fixed theme set to: ${fixedTheme}`, 3000);
+      moodItem.text = `🎯 Mood: Fixed (${fixedTheme})`;
+      speedItem.text = `⚡ Mood Switching Off`;
+      backspaceItem.text = ``;
+    }, 1000); // Small delay to ensure VS Code is ready
+    return;
+  }
+
+  // 🔁 Mood Detection Interval
   setInterval(() => {
-    const mood = analyzeMood();
+    const mood = analyzeMood(intervalMs);
     const speed = keyPressTimestamps.length / intervalSeconds;
 
-    // Update Status Bar
+    // Update status bar
     moodItem.text = `💖 Mood: ${mood}`;
     speedItem.text = `⚡ Speed: ${speed.toFixed(1)} keys/s`;
     backspaceItem.text = `⌫ Backs: ${backspaceCount}`;
 
-    // Switch theme
     switchThemeForMood(mood);
-    vscode.window.showInformationMessage(`🎨 Theme switched to: ${mood}`);
-
-    // Reset backspaces
     backspaceCount = 0;
   }, intervalMs);
 
-  // Optional Hello Command
+  // 👋 Hello command
   context.subscriptions.push(
     vscode.commands.registerCommand('ThemeMeBabe.helloWorld', () => {
       vscode.window.showInformationMessage('👋 Hello from ThemeMeBabe!');
@@ -66,36 +80,29 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-function analyzeMood(): string {
+// 🧠 Mood Detection = Theme Selection
+function analyzeMood(intervalMs: number): string {
   const now = Date.now();
-  keyPressTimestamps = keyPressTimestamps.filter(t => now - t < 15000);
-  const typingSpeed = keyPressTimestamps.length / 15;
+  keyPressTimestamps = keyPressTimestamps.filter(t => now - t <= intervalMs);
+  const speed = keyPressTimestamps.length / (intervalMs / 1000);
 
-  if (typingSpeed > 3 && backspaceCount < 3) return "focused";
-  if (backspaceCount > 5) return "frustrated";
-  if (typingSpeed < 1) return "tired";
-  return "neutral";
+  if (backspaceCount > 5) return "Rizz Frustrated";
+  if (speed > 5) return "Rizz Focused";
+  if (speed > 2) return "Rizz Neutral";
+  return "Rizz Tired";
 }
 
-function switchThemeForMood(mood: string) {
-  const themeMap: { [key: string]: string } = {
-    focused: "Rizz Focused",
-    tired: "Rizz Tired",
-    frustrated: "Rizz Frustrated",
-    neutral: "Rizz Neutral"
-  };
-
-  const themeName = themeMap[mood];
-
-  if (themeName) {
-    vscode.workspace.getConfiguration().update(
-      "workbench.colorTheme",
-      themeName,
-      vscode.ConfigurationTarget.Global
-    );
-  }
+// 🎨 Theme Switcher
+function switchThemeForMood(theme: string) {
+  vscode.workspace.getConfiguration().update(
+    "workbench.colorTheme",
+    theme,
+    vscode.ConfigurationTarget.Global
+  );
+  vscode.window.setStatusBarMessage(`🎨 Theme switched to: ${theme}`, 3000);
 }
 
+// 🧹 Clean up
 export function deactivate() {
   moodItem?.dispose();
   speedItem?.dispose();

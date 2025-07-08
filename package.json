@@ -1,18 +1,21 @@
 {
   "name": "thememebabe",
   "displayName": "ThemeMeBabe",
-  "description": "VS Code changes themes based on your mood.",
-  "version": "0.0.1",
+  "description": "A VS Code extension that changes your theme based on your coding mood — focused, tired, neutral, or frustrated. Mood-based vibes, automatically.",
+  "version": "0.0.3",
   "publisher": "thememebabe",
   "engines": {
     "vscode": "^1.80.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dikshaa2909/thememebabe"
+    "url": "https://github.com/dikshaa2909/ThemeMeBabe.git"
   },
-  "categories": ["Other"],
-  "activationEvents": ["*"],
+  "categories": ["Themes", "Visualization", "Other"],
+  "activationEvents": [
+  "onStartupFinished"
+],
+
   "main": "./dist/extension.js",
   "contributes": {
     "themes": [
@@ -40,33 +43,44 @@
     "commands": [
       {
         "command": "ThemeMeBabe.helloWorld",
-        "title": "Hello World"
+        "title": "ThemeMeBabe: Hello World"
       },
       {
         "command": "ThemeMeBabe.toggleMoodThemes",
-        "title": "ThemeMeBabe: Toggle Mood Themes"
+        "title": "ThemeMeBabe: Toggle Mood-Based Themes"
       }
     ],
     "configuration": {
       "type": "object",
       "title": "ThemeMeBabe Settings",
       "properties": {
+        "thememebabe.autoThemeSwitch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable automatic theme switching based on your mood."
+        },
+        "thememebabe.fixedTheme": {
+          "type": "string",
+          "default": "Rizz Focused",
+          "description": "When auto-switch is off, use this theme instead.",
+          "enum": [
+            "Rizz Focused",
+            "Rizz Tired",
+            "Rizz Frustrated",
+            "Rizz Neutral"
+          ]
+        },
         "thememebabe.intervalSeconds": {
           "type": "number",
           "default": 15,
           "minimum": 5,
           "maximum": 120,
-          "description": "How often (in seconds) ThemeMeBabe analyzes your mood and switches theme."
-        },
-        "thememebabe.enableThemeSwitching": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable or disable automatic mood-based theme switching."
+          "description": "How often (in seconds) your mood is analyzed and the theme is switched."
         },
         "thememebabe.showStatusBar": {
           "type": "boolean",
           "default": true,
-          "description": "Show your mood in the VS Code status bar."
+          "description": "Show mood, typing speed, and backspace count in the status bar."
         }
       }
     }
